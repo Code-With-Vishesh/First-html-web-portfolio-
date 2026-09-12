@@ -1,0 +1,1588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>StudyFlow</title>
+<style>
+  :root{
+    --primary:#2563EB;
+    --primary-dark:#1D4ED8;
+    --bg:#F8FAFC;
+    --card:#FFFFFF;
+    --text:#0F172A;
+    --text-secondary:#64748B;
+    --border:#E2E8F0;
+    --success:#16A34A;
+    --radius-lg:22px;
+    --radius-md:16px;
+    --radius-sm:12px;
+    --shadow-soft:0 8px 24px rgba(15,23,42,0.06);
+    --shadow-card:0 4px 14px rgba(15,23,42,0.05);
+  }
+
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+  }
+
+  html{
+    height:100%;
+    /* keeps 1rem stable across zoomed/odd browser font settings */
+    -webkit-text-size-adjust:100%;
+    text-size-adjust:100%;
+  }
+
+  html,body{
+    margin:0;
+    padding:0;
+    height:100%;
+    background:#EEF2FA;
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  body{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:100vh;
+    min-height:100dvh;
+    padding:32px 16px;
+  }
+
+  button, input{ font-family:inherit; }
+  button, .course-card, .category-chip, .nav-item, .icon-btn{ touch-action:manipulation; }
+
+  /* Disable sticky :hover states on touch devices; only fine-pointer devices get hover feedback */
+  @media (hover:hover) and (pointer:fine){
+    .btn-primary:hover{ background:var(--primary-dark); }
+    .btn-secondary:hover{ border-color:var(--primary); }
+    .search-bar:hover{ border-color:#CBD5E1; }
+    .course-card:hover{ border-color:#CBD5E1; }
+    .icon-btn:hover{ border-color:#CBD5E1; }
+  }
+
+  /* Desktop presentation environment */
+  .stage{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:100%;
+  }
+
+  .device{
+    position:relative;
+    width:min(100%, 393px);
+    height:852px;
+    max-height:calc(100vh - 64px);
+    background:var(--bg);
+    border-radius:44px;
+    box-shadow:0 30px 60px -20px rgba(15,23,42,0.35), 0 0 0 10px #0B0E14, 0 0 0 12px #1e2430;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+  }
+
+  .device::before{
+    content:"";
+    position:absolute;
+    top:10px;
+    left:50%;
+    transform:translateX(-50%);
+    width:120px;
+    height:26px;
+    background:#0B0E14;
+    border-radius:20px;
+    z-index:50;
+  }
+
+  .app{
+    position:relative;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    background:var(--bg);
+  }
+
+  /* ===== Status bar ===== */
+  .status-bar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:18px 24px 6px;
+    font-size:15px;
+    font-weight:600;
+    color:var(--text);
+    flex-shrink:0;
+  }
+  .status-icons{display:flex; align-items:center; gap:6px;}
+
+  /* ===== Screens ===== */
+  .screen{
+    position:absolute;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    background:var(--bg);
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transform:translateX(0);
+  }
+  .screen.active{
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+    position:relative;
+    z-index:1;
+  }
+
+  .screen.enter-right{ animation: slideInRight 320ms ease forwards; }
+  .screen.enter-left{ animation: slideInLeft 320ms ease forwards; }
+  .screen.enter-fade{ animation: fadeIn 280ms ease forwards; }
+
+  @keyframes slideInRight{
+    from{ transform: translateX(24px); opacity:0; }
+    to{ transform: translateX(0); opacity:1; }
+  }
+  @keyframes slideInLeft{
+    from{ transform: translateX(-24px); opacity:0; }
+    to{ transform: translateX(0); opacity:1; }
+  }
+  @keyframes fadeIn{
+    from{ opacity:0; }
+    to{ opacity:1; }
+  }
+
+  .screen-scroll{
+    flex:1;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior-y:contain;
+    scrollbar-width:none;
+  }
+  .screen-scroll::-webkit-scrollbar{display:none;}
+
+  /* =================== ONBOARDING =================== */
+  #onboardingScreen .onboarding-header{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:8px 24px 0;
+  }
+  .logo-mark{
+    width:34px;height:34px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .logo-text{
+    font-size:20px;
+    font-weight:800;
+    letter-spacing:-0.02em;
+  }
+  .logo-text span{color:var(--primary);}
+
+  .onboarding-illustration{
+    margin:18px 24px 0;
+    height:300px;
+    border-radius:28px;
+    background:radial-gradient(circle at 30% 30%, #DCEAFE 0%, #EFF5FF 55%, transparent 75%);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    overflow:hidden;
+  }
+  .onboarding-illustration svg{ width:220px; height:220px; }
+
+  .onboarding-copy{
+    padding:28px 24px 0;
+  }
+  .onboarding-copy h1{
+    font-size:clamp(26px, 7.5vw, 32px);
+    line-height:1.15;
+    font-weight:800;
+    letter-spacing:-0.02em;
+    margin:0 0 12px;
+  }
+  .onboarding-copy h1 .accent{ color:var(--primary); }
+  .onboarding-copy p{
+    font-size:15px;
+    color:var(--text-secondary);
+    line-height:1.55;
+    margin:0;
+  }
+
+  .onboarding-footer{
+    margin-top:auto;
+    padding:20px 24px 28px;
+  }
+
+  .btn-primary{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    width:100%;
+    background:var(--primary);
+    color:#fff;
+    border:none;
+    font-size:16px;
+    font-weight:700;
+    padding:16px 20px;
+    border-radius:16px;
+    cursor:pointer;
+    min-height:52px;
+    transition:background 160ms ease, transform 120ms ease;
+  }
+  .btn-primary:active{ transform:scale(0.98); }
+
+  .btn-secondary{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    width:100%;
+    background:#fff;
+    color:var(--text);
+    border:1.5px solid var(--border);
+    font-size:15px;
+    font-weight:700;
+    padding:14px 18px;
+    border-radius:16px;
+    cursor:pointer;
+    min-height:48px;
+    transition:border-color 160ms ease, background 160ms ease;
+  }
+  .btn-secondary.saved{
+    background:#EFF6FF;
+    border-color:var(--primary);
+    color:var(--primary);
+  }
+
+  .dots{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    margin-top:18px;
+  }
+  .dot{
+    width:8px;height:8px;border-radius:50%;
+    background:var(--border);
+  }
+  .dot.active{
+    width:22px;
+    background:var(--primary);
+    border-radius:6px;
+  }
+
+  /* =================== HOME =================== */
+  .home-header{
+    padding:22px 24px 0;
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    flex-shrink:0;
+  }
+  .home-header h1{
+    font-size:clamp(19px, 5.5vw, 22px);
+    font-weight:800;
+    margin:0 0 2px;
+  }
+  .home-header p{
+    font-size:14px;
+    color:var(--text-secondary);
+    margin:0;
+  }
+  .avatar{
+    width:44px;height:44px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#93C5FD,#2563EB);
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-weight:700;font-size:15px;
+    flex-shrink:0;
+    box-shadow:var(--shadow-card);
+  }
+
+  .search-bar{
+    margin:18px 24px 0;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:13px 16px;
+    cursor:pointer;
+    transition:border-color 150ms ease;
+  }
+  .search-bar input{
+    border:none;
+    outline:none;
+    background:transparent;
+    font-size:14.5px;
+    color:var(--text);
+    flex:1;
+    font-family:inherit;
+  }
+  .search-bar input::placeholder{ color:#94A3B8; }
+
+  .section{
+    padding:26px 24px 0;
+  }
+  .section-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:14px;
+  }
+  .section-head h2{
+    font-size:clamp(15px, 4.2vw, 17px);
+    font-weight:800;
+    margin:0;
+  }
+  .section-head .link{
+    font-size:13px;
+    font-weight:700;
+    color:var(--primary);
+    cursor:pointer;
+    background:none;
+    border:none;
+    font-family:inherit;
+  }
+
+  .category-row{
+    display:flex;
+    gap:10px;
+    overflow-x:auto;
+    padding-bottom:4px;
+    scrollbar-width:none;
+  }
+  .category-row::-webkit-scrollbar{ display:none; }
+
+  .category-chip{
+    flex:0 0 auto;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:10px;
+    min-width:118px;
+    padding:14px;
+    border-radius:16px;
+    background:#fff;
+    border:1px solid var(--border);
+    cursor:pointer;
+    font-family:inherit;
+    transition:all 160ms ease;
+  }
+  .category-chip .chip-icon{
+    width:34px;height:34px;
+    border-radius:10px;
+    background:#EFF6FF;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--primary);
+  }
+  .category-chip .chip-label{
+    font-size:13px;
+    font-weight:700;
+    color:var(--text);
+    text-align:left;
+    line-height:1.3;
+  }
+  .category-chip.selected{
+    background:var(--primary);
+    border-color:var(--primary);
+  }
+  .category-chip.selected .chip-icon{
+    background:rgba(255,255,255,0.18);
+    color:#fff;
+  }
+  .category-chip.selected .chip-label{ color:#fff; }
+
+  .progress-card{
+    background:linear-gradient(145deg,#0F1E3D,#152A56);
+    border-radius:var(--radius-lg);
+    padding:20px;
+    color:#fff;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    box-shadow:0 12px 28px -8px rgba(15,42,90,0.45);
+  }
+  .progress-card-top{
+    display:flex;
+    gap:14px;
+    align-items:flex-start;
+  }
+  .progress-icon{
+    width:52px;height:52px;
+    border-radius:14px;
+    background:rgba(255,255,255,0.12);
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  .progress-info{ flex:1; min-width:0; }
+  .progress-info h3{
+    font-size:15px;
+    font-weight:700;
+    margin:0 0 4px;
+  }
+  .progress-info p{
+    font-size:12.5px;
+    color:#B9C4DC;
+    margin:0;
+  }
+  .progress-chevron{ color:#B9C4DC; flex-shrink:0; margin-top:4px; }
+
+  .progress-bar-track{
+    width:100%;
+    height:7px;
+    border-radius:6px;
+    background:rgba(255,255,255,0.14);
+    overflow:hidden;
+  }
+  .progress-bar-fill{
+    height:100%;
+    border-radius:6px;
+    background:linear-gradient(90deg,#34D399,#16A34A);
+    transition:width 500ms ease;
+  }
+  .progress-bar-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .progress-percent{
+    font-size:12.5px;
+    font-weight:700;
+    color:#B9F5D8;
+    flex-shrink:0;
+  }
+
+  .btn-continue{
+    align-self:flex-start;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background:#fff;
+    color:var(--primary-dark);
+    border:none;
+    font-size:13.5px;
+    font-weight:700;
+    padding:10px 18px;
+    border-radius:12px;
+    cursor:pointer;
+    min-height:40px;
+  }
+  .btn-continue:active{ transform:scale(0.97); }
+
+  .course-list{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .course-card{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:12px;
+    cursor:pointer;
+    text-align:left;
+    font-family:inherit;
+    transition:border-color 150ms ease, box-shadow 150ms ease;
+    box-shadow:var(--shadow-card);
+  }
+  .course-thumb{
+    width:52px;height:52px;
+    border-radius:12px;
+    flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    font-weight:800;
+    font-size:15px;
+    color:#fff;
+  }
+  .course-info{ flex:1; min-width:0; }
+  .course-info h4{
+    font-size:14.5px;
+    font-weight:700;
+    margin:0 0 3px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .course-info .by{
+    font-size:12.5px;
+    color:var(--text-secondary);
+    margin:0 0 4px;
+  }
+  .course-meta{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:12px;
+    color:var(--text-secondary);
+  }
+  .course-meta .rating{ color:#D97706; font-weight:700; }
+  .course-card .chevron{ color:#CBD5E1; flex-shrink:0; }
+
+  .badge{
+    font-size:11px;
+    font-weight:700;
+    padding:4px 9px;
+    border-radius:20px;
+    flex-shrink:0;
+  }
+  .badge.beginner{ background:#DCFCE7; color:#15803D; }
+  .badge.intermediate{ background:#FEF3C7; color:#B45309; }
+  .badge.advanced{ background:#FCE7F3; color:#BE185D; }
+
+  /* bottom padding so content isn't hidden under nav */
+  .content-pad-bottom{ height:100px; flex-shrink:0; }
+
+  /* =================== BOTTOM NAV =================== */
+  .bottom-nav{
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    justify-content:space-around;
+    background:rgba(248,250,252,0.92);
+    backdrop-filter:blur(14px);
+    border-top:1px solid var(--border);
+    padding:10px 8px calc(10px + env(safe-area-inset-bottom, 0px));
+    position:relative;
+    z-index:20;
+  }
+  .nav-item{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+    background:none;
+    border:none;
+    color:var(--text-secondary);
+    font-family:inherit;
+    font-size:11px;
+    font-weight:600;
+    cursor:pointer;
+    padding:6px 10px;
+    min-width:44px;
+    min-height:44px;
+    border-radius:12px;
+    transition:color 150ms ease;
+  }
+  .nav-item.active{ color:var(--primary); }
+  .nav-item:focus-visible, button:focus-visible, input:focus-visible, [tabindex]:focus-visible{
+    outline:2.5px solid var(--primary);
+    outline-offset:2px;
+  }
+
+  /* =================== SEARCH =================== */
+  .search-header{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:16px 20px 0;
+    flex-shrink:0;
+  }
+  .icon-btn{
+    width:40px;height:40px;
+    border-radius:12px;
+    background:#fff;
+    border:1px solid var(--border);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    color:var(--text);
+    flex-shrink:0;
+  }
+  .search-header h1{
+    font-size:clamp(17px, 4.6vw, 19px);
+    font-weight:800;
+    margin:0;
+    flex:1;
+  }
+
+  .search-input-row{
+    margin:16px 20px 0;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:#fff;
+    border:1.5px solid var(--primary);
+    border-radius:16px;
+    padding:13px 14px;
+  }
+  .search-input-row input{
+    flex:1;
+    border:none;
+    outline:none;
+    font-size:14.5px;
+    font-family:inherit;
+    color:var(--text);
+    background:transparent;
+  }
+  .clear-btn{
+    background:none;
+    border:none;
+    cursor:pointer;
+    color:var(--text-secondary);
+    display:flex;
+    padding:4px;
+  }
+
+  .results-head{
+    padding:22px 20px 12px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .results-head h2{
+    font-size:15px;
+    font-weight:800;
+    margin:0;
+  }
+  .results-head .clear-link{
+    font-size:13px;
+    font-weight:700;
+    color:var(--primary);
+    background:none;
+    border:none;
+    cursor:pointer;
+    font-family:inherit;
+  }
+
+  .results-list{
+    padding:0 20px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+
+  .empty-state{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    gap:10px;
+    padding:60px 30px;
+    color:var(--text-secondary);
+  }
+  .empty-state h3{
+    font-size:15px;
+    color:var(--text);
+    margin:6px 0 0;
+  }
+  .empty-state p{
+    font-size:13px;
+    margin:0;
+  }
+
+  /* =================== COURSE DETAILS =================== */
+  .details-cover{
+    margin:16px 20px 0;
+    height:180px;
+    border-radius:20px;
+    position:relative;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .details-cover .save-fab{
+    position:absolute;
+    top:12px;right:12px;
+    width:38px;height:38px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.92);
+    border:none;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    color:var(--text);
+  }
+  .details-cover .save-fab.saved{ color:#DC2626; }
+
+  .details-body{ padding:18px 20px 0; }
+  .details-body h2{
+    font-size:clamp(18px, 5.2vw, 21px);
+    font-weight:800;
+    margin:0 0 4px;
+  }
+  .details-instructor{
+    font-size:13.5px;
+    color:var(--text-secondary);
+    margin:0 0 10px;
+  }
+  .details-stats-row{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    font-size:13px;
+    color:var(--text-secondary);
+    margin-bottom:16px;
+    flex-wrap:wrap;
+  }
+  .details-stats-row .rating{ color:#D97706; font-weight:700; }
+
+  .info-pills{
+    display:flex;
+    gap:8px;
+    margin-bottom:18px;
+    flex-wrap:wrap;
+  }
+  .info-pill{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background:#F1F5F9;
+    padding:8px 12px;
+    border-radius:10px;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--text);
+  }
+
+  .details-body p.description{
+    font-size:14px;
+    line-height:1.6;
+    color:var(--text-secondary);
+    margin:0 0 20px;
+  }
+
+  .details-progress-label{
+    display:flex;
+    justify-content:space-between;
+    font-size:13px;
+    font-weight:700;
+    margin-bottom:8px;
+  }
+
+  .details-actions{
+    display:flex;
+    gap:10px;
+    margin-top:20px;
+  }
+  .details-actions .btn-primary{ flex:1.3; }
+  .details-actions .btn-secondary{ flex:1; }
+
+  .toast{
+    margin:14px 20px 0;
+    background:#ECFDF5;
+    border:1px solid #A7F3D0;
+    color:#15803D;
+    padding:12px 16px;
+    border-radius:12px;
+    font-size:13.5px;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    animation:fadeIn 250ms ease;
+  }
+
+  /* =================== PLACEHOLDER SCREENS =================== */
+  .placeholder-screen{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:0 40px;
+    gap:14px;
+  }
+  .placeholder-icon{
+    width:64px;height:64px;
+    border-radius:18px;
+    background:#EFF6FF;
+    color:var(--primary);
+    display:flex;align-items:center;justify-content:center;
+    margin-bottom:4px;
+  }
+  .placeholder-screen h2{
+    font-size:19px;
+    font-weight:800;
+    margin:0;
+  }
+  .placeholder-screen p{
+    font-size:14px;
+    color:var(--text-secondary);
+    margin:0;
+    line-height:1.5;
+  }
+  .placeholder-header{
+    padding:22px 24px 0;
+    font-size:22px;
+    font-weight:800;
+    flex-shrink:0;
+  }
+
+  /* =======================================================
+     RESPONSIVE SYSTEM
+     - Phones (portrait, <=430px): true full-bleed app, no frame
+     - Phones (landscape, short height): full-bleed app, capped width
+     - Tablets & desktop (>430px, tall enough): centered phone-frame
+     - Short viewports (any width): trim outer chrome so the app
+       always keeps enough vertical room to be usable
+     ======================================================= */
+
+  /* --- Tablet & desktop presentation: centered frame --- */
+  @media (min-width:431px){
+    body{ padding:40px 24px; }
+  }
+
+  /* --- Any short viewport (landscape laptops, small windows): reclaim vertical space --- */
+  @media (max-height:760px) and (min-width:431px){
+    body{ padding:24px; }
+    .device{ max-height:calc(100vh - 48px); }
+  }
+  @media (max-height:560px) and (min-width:431px){
+    body{ padding:14px; }
+    .device{ max-height:calc(100vh - 28px); border-radius:32px; }
+    .device::before{ width:96px; height:22px; }
+  }
+
+  /* --- Phones in portrait: real full-bleed app, frame removed --- */
+  @media (max-width:430px){
+    body{ padding:0; align-items:stretch; }
+    .stage{ height:100vh; height:100dvh; }
+    .device{
+      width:100%;
+      height:100vh;
+      height:100dvh;
+      max-height:none;
+      border-radius:0;
+      box-shadow:none;
+    }
+    .device::before{ display:none; }
+    .status-bar{ padding-top:max(18px, env(safe-area-inset-top)); }
+  }
+
+  /* --- Small / narrow phones (e.g. iPhone SE, small Android): tighten spacing --- */
+  @media (max-width:360px){
+    .onboarding-header,
+    .onboarding-copy,
+    .onboarding-footer,
+    .home-header,
+    .search-bar,
+    .section,
+    .search-header,
+    .search-input-row,
+    .results-head,
+    .results-list,
+    .details-body,
+    .placeholder-header{
+      padding-left:16px;
+      padding-right:16px;
+    }
+    .onboarding-illustration{ margin-left:16px; margin-right:16px; height:240px; }
+    .details-cover{ margin-left:16px; margin-right:16px; }
+    .toast{ margin-left:16px; margin-right:16px; }
+  }
+
+  /* --- Phones in landscape (short height, regardless of width): full-bleed, capped width --- */
+  @media (orientation:landscape) and (max-height:500px){
+    body{ padding:0; align-items:stretch; }
+    .stage{ height:100vh; height:100dvh; }
+    .device{
+      width:min(100%, 480px);
+      height:100vh;
+      height:100dvh;
+      max-height:none;
+      border-radius:0;
+      box-shadow:none;
+    }
+    .device::before{ display:none; }
+    .status-bar{ padding:10px 24px 4px; padding-top:max(10px, env(safe-area-inset-top)); }
+    .onboarding-illustration{ height:150px; margin-top:8px; }
+    .onboarding-copy{ padding-top:14px; }
+    .onboarding-copy p{ display:none; }
+    .onboarding-footer{ padding-top:10px; padding-bottom:18px; }
+  }
+
+  /* --- Very large desktop monitors: keep the app from feeling lost in empty space --- */
+  @media (min-width:1600px){
+    .device{ box-shadow:0 40px 90px -24px rgba(15,23,42,0.4), 0 0 0 10px #0B0E14, 0 0 0 12px #1e2430; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="device">
+    <div class="app" id="app">
+
+      <!-- ============ ONBOARDING ============ -->
+      <section class="screen active" id="onboardingScreen" aria-label="Onboarding">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="status-icons" aria-hidden="true">
+            <svg width="18" height="12" viewBox="0 0 18 12" fill="none"><rect x="0" y="8" width="3" height="4" rx="0.5" fill="currentColor"/><rect x="5" y="5" width="3" height="7" rx="0.5" fill="currentColor"/><rect x="10" y="2" width="3" height="10" rx="0.5" fill="currentColor"/><rect x="15" y="0" width="3" height="12" rx="0.5" fill="currentColor"/></svg>
+            <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 2C11 2 13.5 3.3 15 5L14 6.3C12.7 5 10.5 4 8 4C5.5 4 3.3 5 2 6.3L1 5C2.5 3.3 5 2 8 2Z" fill="currentColor"/><path d="M8 6.5C9.6 6.5 11 7.2 12 8.2L11 9.4C10.2 8.6 9.1 8.1 8 8.1C6.9 8.1 5.8 8.6 5 9.4L4 8.2C5 7.2 6.4 6.5 8 6.5Z" fill="currentColor"/><circle cx="8" cy="11" r="1.2" fill="currentColor"/></svg>
+            <svg width="24" height="12" viewBox="0 0 24 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="2.5" stroke="currentColor"/><rect x="2" y="2" width="16" height="8" rx="1.5" fill="currentColor"/><rect x="22.5" y="4" width="1.5" height="4" rx="0.7" fill="currentColor"/></svg>
+          </span>
+        </div>
+
+        <div class="onboarding-header">
+          <div class="logo-mark">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M12 3L2 8L12 13L22 8L12 3Z" fill="#2563EB"/><path d="M6 10.5V15.5C6 15.5 8 18 12 18C16 18 18 15.5 18 15.5V10.5" stroke="#2563EB" stroke-width="1.6" stroke-linecap="round"/><path d="M22 8V13.5" stroke="#2563EB" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </div>
+          <div class="logo-text">Study<span>Flow</span></div>
+        </div>
+
+        <div class="onboarding-illustration" aria-hidden="true">
+          <svg viewBox="0 0 220 220" fill="none">
+            <circle cx="110" cy="110" r="95" fill="#DBEAFE"/>
+            <rect x="45" y="120" width="130" height="12" rx="6" fill="#93C5FD"/>
+            <rect x="60" y="70" width="100" height="60" rx="10" fill="#2563EB"/>
+            <rect x="70" y="80" width="80" height="8" rx="4" fill="#BFDBFE"/>
+            <rect x="70" y="96" width="60" height="8" rx="4" fill="#BFDBFE"/>
+            <rect x="70" y="112" width="45" height="8" rx="4" fill="#BFDBFE"/>
+            <circle cx="165" cy="55" r="16" fill="#FDE68A"/>
+            <path d="M165 42V38M165 68V72M152 55H148M182 55H178" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round"/>
+            <rect x="35" y="150" width="34" height="34" rx="6" fill="#1D4ED8"/>
+            <path d="M46 178V158L60 168L46 178Z" fill="#fff" transform="translate(-2,-10)"/>
+          </svg>
+        </div>
+
+        <div class="onboarding-copy">
+          <h1>Learn smarter.<br><span class="accent">Grow faster.</span></h1>
+          <p>Discover courses, build skills, and keep your learning journey on track.</p>
+        </div>
+
+        <div class="onboarding-footer">
+          <button class="btn-primary" id="getStartedBtn">Get Started
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="dots" aria-hidden="true">
+            <span class="dot active"></span><span class="dot"></span><span class="dot"></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ HOME ============ -->
+      <section class="screen" id="homeScreen" aria-label="Home">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="status-icons" aria-hidden="true">
+            <svg width="18" height="12" viewBox="0 0 18 12" fill="none"><rect x="0" y="8" width="3" height="4" rx="0.5" fill="currentColor"/><rect x="5" y="5" width="3" height="7" rx="0.5" fill="currentColor"/><rect x="10" y="2" width="3" height="10" rx="0.5" fill="currentColor"/><rect x="15" y="0" width="3" height="12" rx="0.5" fill="currentColor"/></svg>
+            <svg width="24" height="12" viewBox="0 0 24 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="2.5" stroke="currentColor"/><rect x="2" y="2" width="16" height="8" rx="1.5" fill="currentColor"/><rect x="22.5" y="4" width="1.5" height="4" rx="0.7" fill="currentColor"/></svg>
+          </span>
+        </div>
+
+        <div class="home-header">
+          <div>
+            <h1>Good morning 👋</h1>
+            <p>Ready to continue learning?</p>
+          </div>
+          <div class="avatar" aria-label="Your profile">AK</div>
+        </div>
+
+        <button class="search-bar" id="homeSearchTrigger" aria-label="Search courses and topics">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="#94A3B8" stroke-width="2"/><path d="M21 21L16.5 16.5" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"/></svg>
+          <input type="text" placeholder="Search courses, topics..." readonly tabindex="-1">
+        </button>
+
+        <div class="screen-scroll">
+          <div class="section">
+            <div class="section-head">
+              <h2>Explore categories</h2>
+              <button class="link">View all</button>
+            </div>
+            <div class="category-row" id="categoryRow" role="tablist" aria-label="Course categories"></div>
+          </div>
+
+          <div class="section">
+            <div class="section-head">
+              <h2>Continue learning</h2>
+            </div>
+            <button class="progress-card" id="continueCard" aria-label="Continue Complete Web Development course">
+              <div class="progress-card-top">
+                <div class="progress-icon" aria-hidden="true">
+                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M9.5 8L14.5 12L9.5 16V8Z" fill="#fff"/></svg>
+                </div>
+                <div class="progress-info">
+                  <h3>Complete Web Development</h3>
+                  <p>Lesson 8 of 12 · Building APIs</p>
+                </div>
+                <div class="progress-chevron" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+              </div>
+              <div class="progress-bar-row">
+                <div class="progress-bar-track"><div class="progress-bar-fill" style="width:68%"></div></div>
+                <span class="progress-percent">68%</span>
+              </div>
+              <span class="btn-continue" role="button" tabindex="0" id="continueBtn">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M9.5 8L14.5 12L9.5 16V8Z" fill="currentColor"/></svg>
+                Continue
+              </span>
+            </button>
+          </div>
+
+          <div class="section">
+            <div class="section-head">
+              <h2>Popular courses</h2>
+              <button class="link">View all</button>
+            </div>
+            <div class="course-list" id="homeCoursesList"></div>
+          </div>
+
+          <div class="content-pad-bottom"></div>
+        </div>
+
+        <nav class="bottom-nav" aria-label="Primary"></nav>
+      </section>
+
+      <!-- ============ SEARCH + DETAILS ============ -->
+      <section class="screen" id="searchDetailsScreen" aria-label="Search and course details">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="status-icons" aria-hidden="true">
+            <svg width="18" height="12" viewBox="0 0 18 12" fill="none"><rect x="0" y="8" width="3" height="4" rx="0.5" fill="currentColor"/><rect x="5" y="5" width="3" height="7" rx="0.5" fill="currentColor"/><rect x="10" y="2" width="3" height="10" rx="0.5" fill="currentColor"/><rect x="15" y="0" width="3" height="12" rx="0.5" fill="currentColor"/></svg>
+            <svg width="24" height="12" viewBox="0 0 24 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="2.5" stroke="currentColor"/><rect x="2" y="2" width="16" height="8" rx="1.5" fill="currentColor"/><rect x="22.5" y="4" width="1.5" height="4" rx="0.7" fill="currentColor"/></svg>
+          </span>
+        </div>
+
+        <!-- STATE A: SEARCH -->
+        <div class="inner-state" id="searchState">
+          <div class="search-header">
+            <button class="icon-btn" id="searchBackBtn" aria-label="Go to Home">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 6L9 12L15 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <h1>Search</h1>
+            <button class="icon-btn" aria-label="Filter results">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 6H20M7 12H17M10 18H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+
+          <div class="search-input-row">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="#2563EB" stroke-width="2"/><path d="M21 21L16.5 16.5" stroke="#2563EB" stroke-width="2" stroke-linecap="round"/></svg>
+            <input type="text" id="searchInput" placeholder="Search courses..." value="JavaScript" aria-label="Search courses">
+            <button class="clear-btn" id="clearSearchBtn" aria-label="Clear search">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#E2E8F0"/><path d="M9 9L15 15M15 9L9 15" stroke="#64748B" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+
+          <div class="screen-scroll">
+            <div class="results-head">
+              <h2 id="resultsCountLabel">Search results (3)</h2>
+              <button class="clear-link" id="clearAllBtn">Clear</button>
+            </div>
+            <div class="results-list" id="resultsList"></div>
+            <div class="content-pad-bottom"></div>
+          </div>
+        </div>
+
+        <!-- STATE B: COURSE DETAILS -->
+        <div class="inner-state" id="detailsState" style="display:none;">
+          <div class="search-header">
+            <button class="icon-btn" id="detailsBackBtn" aria-label="Back to search results">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 6L9 12L15 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <h1>Course Details</h1>
+            <span style="width:40px;"></span>
+          </div>
+
+          <div class="screen-scroll">
+            <div class="details-cover" id="detailsCover">
+              <button class="save-fab" id="saveFab" aria-label="Save course">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 4H18C18.55 4 19 4.45 19 5V21L12 17L5 21V5C5 4.45 5.45 4 6 4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="none"/></svg>
+              </button>
+            </div>
+
+            <div id="startedToast" style="display:none;"></div>
+
+            <div class="details-body">
+              <h2 id="detailsTitle">Modern JavaScript</h2>
+              <p class="details-instructor" id="detailsInstructor">By John Doe</p>
+              <div class="details-stats-row">
+                <span class="rating" id="detailsRating">★ 4.8</span>
+                <span id="detailsStudents">12.4k students</span>
+              </div>
+
+              <div class="info-pills">
+                <span class="info-pill" id="pillLessons">📘 12 Lessons</span>
+                <span class="info-pill" id="pillDuration">⏱ 8h 30m</span>
+                <span class="info-pill" id="pillLevel">🎯 Beginner</span>
+              </div>
+
+              <p class="description" id="detailsDescription">Learn modern JavaScript from the ground up. Master ES6+ features, build real-world projects, and take your web development skills to the next level.</p>
+
+              <div class="details-progress-label">
+                <span>Your progress</span>
+                <span id="detailsProgressPercent">68%</span>
+              </div>
+              <div class="progress-bar-track">
+                <div class="progress-bar-fill" id="detailsProgressFill" style="width:68%; background:linear-gradient(90deg,#60A5FA,#2563EB);"></div>
+              </div>
+
+              <div class="details-actions">
+                <button class="btn-primary" id="startLearningBtn">Start Learning</button>
+                <button class="btn-secondary" id="saveCourseBtn">Save Course</button>
+              </div>
+            </div>
+            <div class="content-pad-bottom"></div>
+          </div>
+        </div>
+
+        <nav class="bottom-nav" aria-label="Primary"></nav>
+      </section>
+
+      <!-- ============ MY LEARNING (placeholder state) ============ -->
+      <section class="screen" id="myLearningScreen" aria-label="My Learning">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="status-icons" aria-hidden="true">
+            <svg width="18" height="12" viewBox="0 0 18 12" fill="none"><rect x="0" y="8" width="3" height="4" rx="0.5" fill="currentColor"/><rect x="5" y="5" width="3" height="7" rx="0.5" fill="currentColor"/><rect x="10" y="2" width="3" height="10" rx="0.5" fill="currentColor"/><rect x="15" y="0" width="3" height="12" rx="0.5" fill="currentColor"/></svg>
+            <svg width="24" height="12" viewBox="0 0 24 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="2.5" stroke="currentColor"/><rect x="2" y="2" width="16" height="8" rx="1.5" fill="currentColor"/><rect x="22.5" y="4" width="1.5" height="4" rx="0.7" fill="currentColor"/></svg>
+          </span>
+        </div>
+        <div class="placeholder-screen">
+          <div class="placeholder-icon" aria-hidden="true">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 8H16M8 12H16M8 16H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+          <h2>My Learning</h2>
+          <p>Your enrolled courses and saved courses will appear here.</p>
+        </div>
+        <nav class="bottom-nav" aria-label="Primary"></nav>
+      </section>
+
+      <!-- ============ PROFILE (placeholder state) ============ -->
+      <section class="screen" id="profileScreen" aria-label="Profile">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="status-icons" aria-hidden="true">
+            <svg width="18" height="12" viewBox="0 0 18 12" fill="none"><rect x="0" y="8" width="3" height="4" rx="0.5" fill="currentColor"/><rect x="5" y="5" width="3" height="7" rx="0.5" fill="currentColor"/><rect x="10" y="2" width="3" height="10" rx="0.5" fill="currentColor"/><rect x="15" y="0" width="3" height="12" rx="0.5" fill="currentColor"/></svg>
+            <svg width="24" height="12" viewBox="0 0 24 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="2.5" stroke="currentColor"/><rect x="2" y="2" width="16" height="8" rx="1.5" fill="currentColor"/><rect x="22.5" y="4" width="1.5" height="4" rx="0.7" fill="currentColor"/></svg>
+          </span>
+        </div>
+        <div class="placeholder-screen">
+          <div class="placeholder-icon" aria-hidden="true">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="2"/><path d="M5 20C5 16.5 8 14 12 14C16 14 19 16.5 19 20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+          <h2>Profile</h2>
+          <p>Manage your StudyFlow profile.</p>
+        </div>
+        <nav class="bottom-nav" aria-label="Primary"></nav>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------- DATA ---------------- */
+  const categories = [
+    { id:"web", label:"Web Development", icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M8 6L2 12L8 18M16 6L22 12L16 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' },
+    { id:"uiux", label:"UI/UX", icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><circle cx="9" cy="9" r="1.4" fill="currentColor"/><circle cx="15" cy="9" r="1.4" fill="currentColor"/><circle cx="9" cy="15" r="1.4" fill="currentColor"/></svg>' },
+    { id:"js", label:"JavaScript", icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="2"/><path d="M9 15C9 16 9.8 16.5 10.5 16.5C11.3 16.5 11.7 16 11.7 15V10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M14 15C14 16 15 16.5 16 16.5C17 16.5 17.5 15.8 17.5 15.2C17.5 14.5 17 14.1 16 13.8C15.2 13.5 14.5 13.1 14.5 12.3C14.5 11.7 15 11.2 16 11.2C16.8 11.2 17.3 11.5 17.5 12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>' },
+    { id:"react", label:"React", icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="2" fill="currentColor"/><ellipse cx="12" cy="12" rx="10" ry="4" stroke="currentColor" stroke-width="1.6"/><ellipse cx="12" cy="12" rx="10" ry="4" stroke="currentColor" stroke-width="1.6" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" stroke="currentColor" stroke-width="1.6" transform="rotate(120 12 12)"/></svg>' }
+  ];
+
+  const courses = [
+    { id:"modern-js", title:"Modern JavaScript", instructor:"John Doe", rating:4.8, students:"12.4k", lessons:12, duration:"8h 30m", level:"Beginner", category:"js",
+      description:"Learn modern JavaScript from the ground up. Master ES6+ features, build real-world projects, and take your web development skills to the next level.",
+      color1:"#F7DF1E", color2:"#D4B90A", initials:"JS", textColor:"#7A6300" },
+    { id:"uiux-basics", title:"UI/UX Design Basics", instructor:"Sarah Wilson", rating:4.7, students:"8.2k", lessons:10, duration:"6h 10m", level:"Beginner", category:"uiux",
+      description:"Understand the fundamentals of user interface and experience design. Learn wireframing, prototyping, and design systems used by professional teams.",
+      color1:"#C084FC", color2:"#9333EA", initials:"UX", textColor:"#fff" },
+    { id:"react-fund", title:"React Fundamentals", instructor:"Mike Chen", rating:4.9, students:"15.2k", lessons:14, duration:"10h 45m", level:"Intermediate", category:"react",
+      description:"Build modern, component-based web applications with React. Cover hooks, state management, and best practices for production apps.",
+      color1:"#38BDF8", color2:"#0284C7", initials:"⚛", textColor:"#fff" },
+    { id:"js-advanced", title:"JavaScript Advanced", instructor:"Sarah Wilson", rating:4.6, students:"8.2k", lessons:16, duration:"12h 15m", level:"Intermediate", category:"js",
+      description:"Go beyond the basics with closures, async patterns, the event loop, and performance optimization techniques used in real production code.",
+      color1:"#8B5CF6", color2:"#6D28D9", initials:"JS", textColor:"#fff" },
+    { id:"fullstack-js", title:"Full Stack JavaScript", instructor:"Alex Carter", rating:4.7, students:"6.1k", lessons:20, duration:"18h 00m", level:"Advanced", category:"js",
+      description:"Combine frontend and backend JavaScript skills to build and deploy complete web applications from database to browser.",
+      color1:"#1E3A8A", color2:"#1E293B", initials:"</>", textColor:"#93C5FD" }
+  ];
+
+  const navItems = [
+    { id:"home", label:"Home", icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 11L12 4L20 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10V19C6 19.55 6.45 20 7 20H17C17.55 20 18 19.55 18 19V10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' },
+    { id:"search", label:"Search", icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21L16.5 16.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>' },
+    { id:"mylearning", label:"My Learning", icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 8H16M8 12H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>' },
+    { id:"profile", label:"Profile", icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="2"/><path d="M5 20C5 16.5 8 14 12 14C16 14 19 16.5 19 20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>' }
+  ];
+
+  /* ---------------- STATE ---------------- */
+  const appState = {
+    currentScreen: "onboarding",   // onboarding | home | searchdetails | mylearning | profile
+    searchMode: "search",          // search | details
+    selectedCategory: "web",
+    selectedCourse: null,
+    searchQuery: "JavaScript",
+    savedCourses: loadSaved(),
+    startedCourses: loadStarted()
+  };
+
+  function loadSaved(){
+    try{
+      const raw = localStorage.getItem("studyflow_saved_courses");
+      return raw ? JSON.parse(raw) : [];
+    }catch(e){ return []; }
+  }
+  function persistSaved(){
+    try{ localStorage.setItem("studyflow_saved_courses", JSON.stringify(appState.savedCourses)); }catch(e){}
+  }
+  function loadStarted(){
+    try{
+      const raw = localStorage.getItem("studyflow_started_courses");
+      return raw ? JSON.parse(raw) : [];
+    }catch(e){ return []; }
+  }
+  function persistStarted(){
+    try{ localStorage.setItem("studyflow_started_courses", JSON.stringify(appState.startedCourses)); }catch(e){}
+  }
+
+  /* ---------------- ELEMENTS ---------------- */
+  const screens = {
+    onboarding: document.getElementById("onboardingScreen"),
+    home: document.getElementById("homeScreen"),
+    searchdetails: document.getElementById("searchDetailsScreen"),
+    mylearning: document.getElementById("myLearningScreen"),
+    profile: document.getElementById("profileScreen")
+  };
+
+  const searchState = document.getElementById("searchState");
+  const detailsState = document.getElementById("detailsState");
+
+  /* ---------------- SCREEN SWITCHING ---------------- */
+  function showScreen(name, direction){
+    if (appState.currentScreen === name) return;
+    const prevName = appState.currentScreen;
+    const prevEl = screens[prevName];
+    const nextEl = screens[name];
+
+    if (prevEl){
+      prevEl.classList.remove("active","enter-right","enter-left","enter-fade");
+    }
+
+    appState.currentScreen = name;
+
+    nextEl.classList.add("active");
+    // pick animation
+    const anim = direction === "back" ? "enter-left" : "enter-right";
+    nextEl.classList.remove("enter-right","enter-left","enter-fade");
+    // force reflow to restart animation
+    void nextEl.offsetWidth;
+    nextEl.classList.add(anim);
+
+    // reset scroll of newly shown screen
+    const scrollArea = nextEl.querySelector(".screen-scroll");
+    if (scrollArea) scrollArea.scrollTop = 0;
+
+    updateNavigation();
+  }
+
+  /* ---------------- NAV RENDERING ---------------- */
+  function activeNavId(){
+    if (appState.currentScreen === "home") return "home";
+    if (appState.currentScreen === "searchdetails") return "search";
+    if (appState.currentScreen === "mylearning") return "mylearning";
+    if (appState.currentScreen === "profile") return "profile";
+    return "home";
+  }
+
+  function renderAllNavBars(){
+    document.querySelectorAll(".bottom-nav").forEach(nav => {
+      nav.innerHTML = "";
+      navItems.forEach(item => {
+        const btn = document.createElement("button");
+        btn.className = "nav-item";
+        btn.setAttribute("aria-label", item.label);
+        btn.dataset.nav = item.id;
+        btn.innerHTML = `${item.icon}<span>${item.label}</span>`;
+        btn.addEventListener("click", () => handleNavClick(item.id));
+        nav.appendChild(btn);
+      });
+    });
+    updateNavigation();
+  }
+
+  function updateNavigation(){
+    const active = activeNavId();
+    document.querySelectorAll(".nav-item").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.nav === active);
+    });
+  }
+
+  function handleNavClick(id){
+    if (id === "home"){
+      showScreen("home");
+    } else if (id === "search"){
+      appState.searchMode = "search";
+      renderSearchState();
+      showScreen("searchdetails");
+    } else if (id === "mylearning"){
+      showScreen("mylearning");
+    } else if (id === "profile"){
+      showScreen("profile");
+    }
+  }
+
+  /* ---------------- HOME: CATEGORIES ---------------- */
+  function renderCategories(){
+    const row = document.getElementById("categoryRow");
+    row.innerHTML = "";
+    categories.forEach(cat => {
+      const chip = document.createElement("button");
+      chip.className = "category-chip" + (appState.selectedCategory === cat.id ? " selected" : "");
+      chip.setAttribute("role","tab");
+      chip.setAttribute("aria-selected", appState.selectedCategory === cat.id ? "true":"false");
+      chip.innerHTML = `<span class="chip-icon">${cat.icon}</span><span class="chip-label">${cat.label}</span>`;
+      chip.addEventListener("click", () => {
+        appState.selectedCategory = cat.id;
+        renderCategories();
+      });
+      row.appendChild(chip);
+    });
+  }
+
+  /* ---------------- HOME: POPULAR COURSES ---------------- */
+  function courseCardHTML(course, extra){
+    const badgeClass = course.level.toLowerCase();
+    return `
+      <div class="course-thumb" style="background:linear-gradient(135deg, ${course.color1}, ${course.color2}); color:${course.textColor}">${course.initials}</div>
+      <div class="course-info">
+        <h4>${course.title}</h4>
+        <p class="by">By ${course.instructor}</p>
+        <div class="course-meta">
+          <span class="rating">★ ${course.rating}</span>
+          <span>${course.students ? "" : ""}${course.lessons} lessons</span>
+          ${extra ? `<span class="badge ${badgeClass}">${course.level}</span>` : ""}
+        </div>
+      </div>
+      <span class="chevron" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+    `;
+  }
+
+  function renderHomeCourses(){
+    const list = document.getElementById("homeCoursesList");
+    list.innerHTML = "";
+    const featured = [courses[0], courses[1], courses[2]];
+    featured.forEach(course => {
+      const card = document.createElement("button");
+      card.className = "course-card";
+      card.innerHTML = courseCardHTML(course, false);
+      card.addEventListener("click", () => openCourseDetails(course.id, "home"));
+      list.appendChild(card);
+    });
+  }
+
+  /* ---------------- SEARCH STATE ---------------- */
+  function filterCourses(query){
+    const q = query.trim().toLowerCase();
+    if (!q) return courses;
+    return courses.filter(c =>
+      c.title.toLowerCase().includes(q) ||
+      c.instructor.toLowerCase().includes(q) ||
+      c.category.toLowerCase().includes(q) ||
+      c.level.toLowerCase().includes(q)
+    );
+  }
+
+  function renderSearchResults(){
+    const list = document.getElementById("resultsList");
+    const countLabel = document.getElementById("resultsCountLabel");
+    const results = filterCourses(appState.searchQuery);
+    list.innerHTML = "";
+    countLabel.textContent = `Search results (${results.length})`;
+
+    if (results.length === 0){
+      list.innerHTML = `
+        <div class="empty-state">
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#94A3B8" stroke-width="1.8"/><path d="M21 21L16.5 16.5" stroke="#94A3B8" stroke-width="1.8" stroke-linecap="round"/><path d="M8 11H14" stroke="#94A3B8" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <h3>No courses found</h3>
+          <p>Try a different keyword or browse categories on Home.</p>
+        </div>`;
+      return;
+    }
+
+    results.forEach(course => {
+      const card = document.createElement("button");
+      card.className = "course-card";
+      card.innerHTML = courseCardHTML(course, true);
+      card.addEventListener("click", () => openCourseDetails(course.id, "search"));
+      list.appendChild(card);
+    });
+  }
+
+  function renderSearchState(){
+    const input = document.getElementById("searchInput");
+    input.value = appState.searchQuery;
+    renderSearchResults();
+    switchInnerState("search");
+  }
+
+  function switchInnerState(mode){
+    appState.searchMode = mode;
+    if (mode === "search"){
+      detailsState.style.display = "none";
+      searchState.style.display = "block";
+    } else {
+      searchState.style.display = "none";
+      detailsState.style.display = "block";
+    }
+  }
+
+  /* ---------------- COURSE DETAILS ---------------- */
+  function findCourse(id){
+    return courses.find(c => c.id === id);
+  }
+
+  function isSaved(id){
+    return appState.savedCourses.includes(id);
+  }
+
+  function renderCourseDetails(){
+    const course = findCourse(appState.selectedCourse);
+    if (!course) return;
+
+    document.getElementById("detailsTitle").textContent = course.title;
+    document.getElementById("detailsInstructor").textContent = `By ${course.instructor}`;
+    document.getElementById("detailsRating").textContent = `★ ${course.rating}`;
+    document.getElementById("detailsStudents").textContent = `${course.students} students`;
+    document.getElementById("pillLessons").textContent = `📘 ${course.lessons} Lessons`;
+    document.getElementById("pillDuration").textContent = `⏱ ${course.duration}`;
+    document.getElementById("pillLevel").textContent = `🎯 ${course.level}`;
+    document.getElementById("detailsDescription").textContent = course.description;
+
+    const progress = course.id === "modern-js" ? 68 : (course.id === "react-fund" ? 24 : 0);
+    document.getElementById("detailsProgressPercent").textContent = `${progress}%`;
+    document.getElementById("detailsProgressFill").style.width = `${progress}%`;
+
+    const cover = document.getElementById("detailsCover");
+    cover.style.background = `linear-gradient(135deg, ${course.color1}, ${course.color2})`;
+    cover.innerHTML = `<div style="font-size:52px; font-weight:800; color:${course.textColor}; opacity:0.9;">${course.initials}</div>` + cover.innerHTML;
+    // re-add save fab (since we overwrote innerHTML above, rebuild properly)
+    cover.innerHTML = `
+      <div style="font-size:52px; font-weight:800; color:${course.textColor}; opacity:0.9;">${course.initials}</div>
+      <button class="save-fab${isSaved(course.id) ? " saved":""}" id="saveFab" aria-label="Save course">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="${isSaved(course.id) ? 'currentColor':'none'}"><path d="M6 4H18C18.55 4 19 4.45 19 5V21L12 17L5 21V5C5 4.45 5.45 4 6 4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      </button>
+    `;
+    document.getElementById("saveFab").addEventListener("click", toggleSaveCourse);
+
+    const saveBtn = document.getElementById("saveCourseBtn");
+    updateSaveButton(saveBtn, course.id);
+
+    document.getElementById("startedToast").style.display = "none";
+    document.getElementById("startedToast").innerHTML = "";
+  }
+
+  function updateSaveButton(btn, id){
+    if (isSaved(id)){
+      btn.textContent = "Saved ✓";
+      btn.classList.add("saved");
+    } else {
+      btn.textContent = "Save Course";
+      btn.classList.remove("saved");
+    }
+  }
+
+  function toggleSaveCourse(){
+    const id = appState.selectedCourse;
+    if (isSaved(id)){
+      appState.savedCourses = appState.savedCourses.filter(c => c !== id);
+    } else {
+      appState.savedCourses.push(id);
+    }
+    persistSaved();
+    renderCourseDetails();
+  }
+
+  function openCourseDetails(id, from){
+    appState.selectedCourse = id;
+    renderCourseDetails();
+    switchInnerState("details");
+    showScreen("searchdetails");
+    const scrollArea = detailsState.querySelector(".screen-scroll");
+    if (scrollArea) scrollArea.scrollTop = 0;
+  }
+
+  function goBackFromDetails(){
+    switchInnerState("search");
+    const scrollArea = searchState.querySelector(".screen-scroll");
+    if (scrollArea) scrollArea.scrollTop = 0;
+  }
+
+  function startLearning(){
+    const id = appState.selectedCourse;
+    if (!appState.startedCourses.includes(id)){
+      appState.startedCourses.push(id);
+      persistStarted();
+    }
+    const toast = document.getElementById("startedToast");
+    toast.style.display = "block";
+    toast.innerHTML = `<div class="toast">✓ Course started successfully</div>`;
+    setTimeout(() => {
+      toast.style.display = "none";
+      toast.innerHTML = "";
+    }, 2600);
+  }
+
+  /* ---------------- EVENT WIRING ---------------- */
+  document.getElementById("getStartedBtn").addEventListener("click", () => {
+    showScreen("home");
+  });
+
+  document.getElementById("homeSearchTrigger").addEventListener("click", () => {
+    appState.searchQuery = "";
+    renderSearchState();
+    showScreen("searchdetails");
+  });
+
+  document.getElementById("continueCard").addEventListener("click", (e) => {
+    e.stopPropagation();
+    openCourseDetails("modern-js", "home");
+  });
+
+  document.getElementById("searchBackBtn").addEventListener("click", () => {
+    showScreen("home", "back");
+  });
+
+  document.getElementById("detailsBackBtn").addEventListener("click", goBackFromDetails);
+
+  document.getElementById("searchInput").addEventListener("input", (e) => {
+    appState.searchQuery = e.target.value;
+    renderSearchResults();
+  });
+
+  document.getElementById("clearSearchBtn").addEventListener("click", () => {
+    appState.searchQuery = "";
+    document.getElementById("searchInput").value = "";
+    document.getElementById("searchInput").focus();
+    renderSearchResults();
+  });
+
+  document.getElementById("clearAllBtn").addEventListener("click", () => {
+    appState.searchQuery = "";
+    document.getElementById("searchInput").value = "";
+    renderSearchResults();
+  });
+
+  document.getElementById("startLearningBtn").addEventListener("click", startLearning);
+  document.getElementById("saveCourseBtn").addEventListener("click", toggleSaveCourse);
+
+  /* ---------------- INIT ---------------- */
+  renderAllNavBars();
+  renderCategories();
+  renderHomeCourses();
+  renderSearchState();
+
+})();
+</script>
+
+</body>
+</html>
