@@ -1,313 +1,1096 @@
-My HTML first code 
-
 <!DOCTYPE html>
-
-<html lang=”hi”>
-
+<html lang="en">
 <head>
-
-    <meta charset=”UTF-8”>
-
-    <meta name=”viewport” content=”width=device-width, initial-scale=1.0”>
-
-    <title>My portfolio</title>
-
-    <link rel=”stylesheet” href=”style.css”>
-
-
-
-</head>
+<!-- ============================= HEAD ============================= -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vishesh Jaiswal — Web Developer</title>
+<meta name="description" content="Portfolio of Vishesh Jaiswal, a web developer building clean, modern web experiences with HTML, CSS and JavaScript.">
 
 <style>
-
-Body {
-
-    Font-family: Arial, sans-serif;
-
-    Margin: 0;
-
-    Padding: 0;
-
-    Background-color: #f4f4f4;
-
-    Text-align: center;
-
-}
-
-
-
-Header {
-
-    Background: #333;
-
-    Color: white;
-
-    Padding: 15px;
-
-}
-
-
-
-Nav ul {
-
-    List-style: none;
-
-    Padding: 0;
-
-}
-
-
-
-Nav ul li {
-
-    Display: inline;
-
-    Margin: 0 15px;
-
-}
-
-
-
-Nav ul li a {
-
-    Color: white;
-
-    Text-decoration: none;
-
-}
-
-
-
-Section {
-
-    Margin: 50px 20px;
-
-    Padding: 20px;
-
-    Background: white;
-
-    Border-radius: 5px;
-
-    Box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-
-}
-
-
-
-.project {
-
-    Border: 1px solid #ddd;
-
-    Padding: 15px;
-
-    Margin: 10px;
-
-    Border-radius: 5px;
-
-}
-
-
-
-Form input, form textarea {
-
-    Width: 80%;
-
-    Padding: 10px;
-
-    Margin: 10px 0;
-
-    Border: 1px solid #ddd;
-
-    Border-radius: 5px;
-
-}
-
-
-
-Button {
-
-    Padding: 10px 20px;
-
-    Background: #333;
-
-    Color: white;
-
-    Border: none;
-
-    Cursor: pointer;
-
-}
-
-
-
-Footer {
-
-    Background: #333;
-
-    Color: white;
-
-    Padding: 10px;
-
-    Margin-top: 20px;
-
-}
+  /* ===================================================================
+     THEME VARIABLES
+  =================================================================== */
+  :root{
+    --bg:#0B0F19;
+    --bg-2:#111827;
+    --card:#151D2E;
+    --text:#F8FAFC;
+    --muted:#94A3B8;
+    --border:rgba(255,255,255,0.10);
+    --accent:#22D3EE;
+    --accent-2:#8B5CF6;
+    --accent-soft:rgba(34,211,238,0.12);
+    --shadow: 0 10px 30px rgba(0,0,0,0.35);
+    --radius-card:22px;
+    --radius-btn:12px;
+    --container:1180px;
+    --font: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color-scheme: dark;
+  }
+
+  [data-theme="light"]{
+    --bg:#F8FAFC;
+    --bg-2:#FFFFFF;
+    --card:#FFFFFF;
+    --text:#0F172A;
+    --muted:#475569;
+    --border:rgba(15,23,42,0.10);
+    --accent:#0EA5C7;
+    --accent-2:#7C3AED;
+    --accent-soft:rgba(14,165,199,0.10);
+    --shadow: 0 10px 30px rgba(15,23,42,0.08);
+    color-scheme: light;
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    *, *::before, *::after{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important; }
+  }
+
+  body{
+    margin:0;
+    font-family:var(--font);
+    background:var(--bg);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+    transition: background 0.4s ease, color 0.4s ease;
+    overflow-x:hidden;
+  }
+
+  .wrap{
+    max-width:var(--container);
+    margin:0 auto;
+    padding:0 24px;
+  }
+
+  a{ color:inherit; }
+
+  img, svg{ display:block; max-width:100%; }
+
+  /* subtle backdrop decoration */
+  .bg-decor{
+    position:fixed;
+    inset:0;
+    z-index:-1;
+    pointer-events:none;
+    background:
+      radial-gradient(600px circle at 15% 10%, var(--accent-soft), transparent 60%),
+      radial-gradient(500px circle at 85% 30%, rgba(139,92,246,0.10), transparent 60%);
+    opacity:0.9;
+  }
+
+  /* ===================================================================
+     NAVBAR
+  =================================================================== */
+  header.navbar{
+    position:sticky;
+    top:16px;
+    z-index:100;
+    margin:16px auto 0;
+    max-width:calc(var(--container) - 48px);
+  }
+  .navbar-inner{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:12px 20px;
+    border:1px solid var(--border);
+    border-radius:16px;
+    background:color-mix(in srgb, var(--bg-2) 70%, transparent);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    box-shadow:var(--shadow);
+  }
+  .logo{
+    font-weight:700;
+    font-size:18px;
+    letter-spacing:0.02em;
+    text-decoration:none;
+    color:var(--text);
+    white-space:nowrap;
+  }
+  .logo span{ color:var(--accent); }
+
+  nav.nav-links{
+    display:flex;
+    align-items:center;
+    gap:28px;
+  }
+  .nav-links a{
+    position:relative;
+    text-decoration:none;
+    color:var(--muted);
+    font-size:15px;
+    font-weight:500;
+    padding:4px 2px;
+    transition:color 0.25s ease;
+  }
+  .nav-links a::after{
+    content:"";
+    position:absolute;
+    left:0; bottom:-4px;
+    width:0; height:2px;
+    background:var(--accent);
+    transition:width 0.25s ease;
+    border-radius:2px;
+  }
+  .nav-links a:hover,
+  .nav-links a.active{ color:var(--text); }
+  .nav-links a:hover::after,
+  .nav-links a.active::after{ width:100%; }
+
+  .nav-right{ display:flex; align-items:center; gap:18px; }
+
+  .theme-toggle{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:38px; height:38px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:transparent;
+    color:var(--text);
+    cursor:pointer;
+    transition:transform 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+  }
+  .theme-toggle:hover{ background:var(--accent-soft); border-color:var(--accent); }
+  .theme-toggle:active{ transform:scale(0.9) rotate(15deg); }
+  .theme-toggle svg{ width:18px; height:18px; }
+
+  .menu-btn{
+    display:none;
+    width:38px; height:38px;
+    align-items:center; justify-content:center;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:transparent;
+    color:var(--text);
+    cursor:pointer;
+  }
+
+  .mobile-panel{
+    display:none;
+    flex-direction:column;
+    gap:2px;
+    margin-top:10px;
+    padding:10px;
+    border:1px solid var(--border);
+    border-radius:16px;
+    background:var(--bg-2);
+    box-shadow:var(--shadow);
+  }
+  .mobile-panel a{
+    text-decoration:none;
+    color:var(--text);
+    padding:12px 14px;
+    border-radius:10px;
+    font-weight:500;
+  }
+  .mobile-panel a:hover{ background:var(--accent-soft); }
+  .mobile-panel.open{ display:flex; }
+
+  /* ===================================================================
+     BUTTONS
+  =================================================================== */
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:12px 22px;
+    border-radius:var(--radius-btn);
+    font-weight:600;
+    font-size:15px;
+    text-decoration:none;
+    cursor:pointer;
+    border:1px solid var(--accent);
+    background:transparent;
+    color:var(--text);
+    transition:transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+  }
+  .btn-primary{ background:var(--accent); color:#04121A; border-color:var(--accent); }
+  .btn-primary:hover{ box-shadow:0 8px 24px var(--accent-soft); transform:translateY(-2px); }
+  .btn-secondary:hover{ background:var(--accent-soft); transform:translateY(-2px); }
+  .btn:active{ transform:scale(0.97); }
+  .btn svg{ width:16px; height:16px; transition:transform 0.25s ease; }
+  .btn:hover svg{ transform:translateX(3px); }
+
+  /* ===================================================================
+     SECTION HELPERS
+  =================================================================== */
+  section{ padding:100px 0; }
+  .eyebrow{
+    display:inline-block;
+    font-size:13px;
+    font-weight:600;
+    color:var(--accent);
+    letter-spacing:0.06em;
+    margin-bottom:14px;
+  }
+  h2.section-title{
+    font-size:clamp(28px,3.4vw,40px);
+    font-weight:700;
+    margin:0 0 16px;
+    letter-spacing:-0.01em;
+  }
+  .section-lead{
+    color:var(--muted);
+    font-size:17px;
+    line-height:1.7;
+    max-width:60ch;
+    margin:0 0 48px;
+  }
+
+  .reveal{
+    opacity:0;
+    transform:translateY(24px);
+    transition:opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.in-view{ opacity:1; transform:translateY(0); }
+
+  /* ===================================================================
+     HERO
+  =================================================================== */
+  .hero{
+    padding:150px 0 110px;
+  }
+  .hero-grid{
+    display:grid;
+    grid-template-columns:1.1fr 0.9fr;
+    gap:60px;
+    align-items:center;
+  }
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:7px 14px;
+    border:1px solid var(--border);
+    border-radius:100px;
+    font-size:13px;
+    font-weight:600;
+    color:var(--muted);
+    background:var(--bg-2);
+    margin-bottom:22px;
+  }
+  .badge::before{
+    content:"";
+    width:7px; height:7px;
+    border-radius:50%;
+    background:var(--accent);
+  }
+  .hero h1{
+    font-size:clamp(36px,5vw,58px);
+    line-height:1.12;
+    font-weight:800;
+    letter-spacing:-0.02em;
+    margin:0 0 20px;
+  }
+  .hero h1 em{
+    font-style:normal;
+    color:var(--accent);
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+  }
+  .hero p.lead{
+    color:var(--muted);
+    font-size:18px;
+    line-height:1.7;
+    max-width:52ch;
+    margin:0 0 34px;
+  }
+  .hero-actions{ display:flex; gap:16px; flex-wrap:wrap; }
+
+  /* code visual */
+  .code-card{
+    border:1px solid var(--border);
+    border-radius:var(--radius-card);
+    background:var(--card);
+    box-shadow:var(--shadow);
+    overflow:hidden;
+    animation:float 6s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce){ .code-card{ animation:none; } }
+  @keyframes float{
+    0%,100%{ transform:translateY(0); }
+    50%{ transform:translateY(-12px); }
+  }
+  .code-card-bar{
+    display:flex;
+    gap:7px;
+    padding:14px 16px;
+    border-bottom:1px solid var(--border);
+  }
+  .code-card-bar span{
+    width:10px; height:10px; border-radius:50%;
+    background:var(--muted); opacity:0.5;
+  }
+  .code-card pre{
+    margin:0;
+    padding:24px 22px 30px;
+    font-family:"SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size:14px;
+    line-height:1.8;
+    color:var(--muted);
+    overflow-x:auto;
+  }
+  .code-card pre .tag{ color:var(--accent-2); }
+  .code-card pre .txt{ color:var(--text); }
+  .code-card pre .cmt{ color:var(--muted); }
+
+  /* ===================================================================
+     ABOUT
+  =================================================================== */
+  .about-grid{
+    display:grid;
+    grid-template-columns:1.2fr 0.8fr;
+    gap:56px;
+    align-items:start;
+  }
+  .about-grid p{
+    color:var(--muted);
+    font-size:17px;
+    line-height:1.8;
+    max-width:56ch;
+    margin:0 0 18px;
+  }
+  .info-card{
+    border:1px solid var(--border);
+    border-radius:var(--radius-card);
+    background:var(--card);
+    padding:28px;
+    box-shadow:var(--shadow);
+  }
+  .info-row{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:14px 0;
+    border-bottom:1px solid var(--border);
+  }
+  .info-row:last-child{ border-bottom:none; }
+  .info-row .icon{
+    width:36px; height:36px;
+    border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--accent-soft);
+    color:var(--accent);
+    flex-shrink:0;
+  }
+  .info-row .icon svg{ width:17px; height:17px; }
+  .info-row .label{ font-size:12px; color:var(--muted); margin-bottom:2px; }
+  .info-row .value{ font-size:15px; font-weight:600; }
+
+  /* ===================================================================
+     SKILLS
+  =================================================================== */
+  .skills-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(150px,1fr));
+    gap:16px;
+  }
+  .skill-card{
+    border:1px solid var(--border);
+    border-radius:16px;
+    background:var(--card);
+    padding:20px 18px;
+    text-align:left;
+    transition:transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .skill-card:hover{
+    transform:translateY(-4px);
+    border-color:var(--accent);
+    box-shadow:var(--shadow);
+  }
+  .skill-card .icon{
+    width:34px; height:34px;
+    margin-bottom:14px;
+    color:var(--accent);
+  }
+  .skill-card .icon svg{ width:100%; height:100%; }
+  .skill-card h3{ font-size:15px; margin:0 0 4px; font-weight:600; }
+  .skill-card p{ font-size:13px; color:var(--muted); margin:0; line-height:1.5; }
+
+  /* ===================================================================
+     PROJECTS
+  =================================================================== */
+  .project-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:24px;
+  }
+  .project-card{
+    border:1px solid var(--border);
+    border-radius:20px;
+    background:var(--card);
+    padding:0 0 22px;
+    overflow:hidden;
+    transition:transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    display:flex;
+    flex-direction:column;
+  }
+  .project-card:hover{
+    transform:translateY(-7px);
+    border-color:var(--accent);
+    box-shadow:var(--shadow);
+  }
+  .project-visual{
+    height:150px;
+    display:flex; align-items:center; justify-content:center;
+    background:
+      linear-gradient(135deg, var(--accent-soft), rgba(139,92,246,0.08));
+    border-bottom:1px solid var(--border);
+    color:var(--accent);
+    transition:transform 0.35s ease;
+  }
+  .project-card:hover .project-visual{ transform:scale(1.03); }
+  .project-visual svg{ width:44px; height:44px; }
+  .project-body{ padding:22px 22px 0; flex:1; display:flex; flex-direction:column; }
+  .project-body h3{ font-size:19px; margin:0 0 8px; }
+  .project-body p{ font-size:14.5px; color:var(--muted); line-height:1.65; margin:0 0 16px; flex:1; }
+  .tags{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px; }
+  .tag{
+    font-size:12px;
+    font-weight:600;
+    padding:5px 10px;
+    border-radius:8px;
+    background:var(--accent-soft);
+    color:var(--accent);
+  }
+  .project-link{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size:14.5px;
+    font-weight:600;
+    text-decoration:none;
+    color:var(--text);
+  }
+  .project-link svg{ width:15px; height:15px; transition:transform 0.25s ease; }
+  .project-link:hover svg{ transform:translateX(4px); }
+  .project-link:hover{ color:var(--accent); }
+  .placeholder-card{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    min-height:260px;
+    border:1px dashed var(--border);
+  }
+  .placeholder-card p{ color:var(--muted); font-size:14px; padding:0 24px; }
+
+  /* ===================================================================
+     CONTACT
+  =================================================================== */
+  .contact-grid{
+    display:grid;
+    grid-template-columns:0.85fr 1.15fr;
+    gap:56px;
+  }
+  .contact-list{ margin-top:28px; display:flex; flex-direction:column; gap:16px; }
+  .contact-list a, .contact-list .row{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    text-decoration:none;
+    color:var(--text);
+    font-size:15px;
+    font-weight:500;
+  }
+  .contact-list .icon{
+    width:38px; height:38px;
+    border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--accent-soft);
+    color:var(--accent);
+    flex-shrink:0;
+  }
+  .contact-list .icon svg{ width:17px; height:17px; }
+
+  .social-row{ display:flex; gap:12px; margin-top:32px; }
+  .social-btn{
+    width:40px; height:40px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    color:var(--muted);
+    text-decoration:none;
+    transition:color 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+  }
+  .social-btn:hover{ color:var(--accent); border-color:var(--accent); transform:translateY(-3px); }
+  .social-btn svg{ width:18px; height:18px; }
+
+  form.contact-form{
+    border:1px solid var(--border);
+    border-radius:var(--radius-card);
+    background:var(--card);
+    padding:30px;
+    box-shadow:var(--shadow);
+  }
+  .field{ margin-bottom:20px; }
+  .field label{
+    display:block;
+    font-size:13.5px;
+    font-weight:600;
+    margin-bottom:8px;
+    color:var(--muted);
+  }
+  .field input, .field textarea{
+    width:100%;
+    padding:13px 14px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:var(--bg-2);
+    color:var(--text);
+    font-family:var(--font);
+    font-size:15px;
+    transition:border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .field input:focus, .field textarea:focus{
+    outline:none;
+    border-color:var(--accent);
+    box-shadow:0 0 0 3px var(--accent-soft);
+  }
+  .field textarea{ resize:vertical; min-height:120px; }
+  .field .error{
+    display:none;
+    font-size:12.5px;
+    color:#F87171;
+    margin-top:6px;
+  }
+  .field.has-error input, .field.has-error textarea{ border-color:#F87171; }
+  .field.has-error .error{ display:block; }
+
+  .form-msg{
+    display:none;
+    margin-top:16px;
+    padding:12px 14px;
+    border-radius:10px;
+    background:var(--accent-soft);
+    color:var(--accent);
+    font-size:14px;
+    font-weight:600;
+  }
+  .form-msg.show{ display:block; }
+
+  /* ===================================================================
+     FOOTER
+  =================================================================== */
+  footer{
+    border-top:1px solid var(--border);
+    padding:44px 0 26px;
+    margin-top:40px;
+  }
+  .footer-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:24px;
+    flex-wrap:wrap;
+    margin-bottom:28px;
+  }
+  .footer-brand p{ color:var(--muted); font-size:14px; margin:8px 0 0; max-width:32ch; }
+  .footer-links{ display:flex; gap:22px; flex-wrap:wrap; }
+  .footer-links a{ text-decoration:none; color:var(--muted); font-size:14.5px; font-weight:500; transition:color 0.2s ease; }
+  .footer-links a:hover{ color:var(--text); }
+  .footer-bottom{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:12px;
+    padding-top:22px;
+    border-top:1px solid var(--border);
+    color:var(--muted);
+    font-size:13px;
+  }
+
+  /* ===================================================================
+     BACK TO TOP
+  =================================================================== */
+  .to-top{
+    position:fixed;
+    right:24px;
+    bottom:24px;
+    width:46px; height:46px;
+    border-radius:50%;
+    border:1px solid var(--border);
+    background:var(--bg-2);
+    color:var(--text);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    box-shadow:var(--shadow);
+    opacity:0;
+    visibility:hidden;
+    transform:translateY(10px);
+    transition:opacity 0.3s ease, transform 0.3s ease, border-color 0.3s ease, visibility 0.3s ease;
+    z-index:90;
+  }
+  .to-top.visible{ opacity:1; visibility:visible; transform:translateY(0); }
+  .to-top:hover{ border-color:var(--accent); color:var(--accent); }
+  .to-top svg{ width:18px; height:18px; }
+
+  /* focus visibility for keyboard users */
+  a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:2px;
+  }
+
+  /* ===================================================================
+     RESPONSIVE
+  =================================================================== */
+  @media (max-width:1199px){
+    .project-grid{ grid-template-columns:repeat(2,1fr); }
+  }
+
+  @media (max-width:900px){
+    .nav-links, .nav-right .theme-toggle-desktop{ display:none; }
+    .menu-btn{ display:flex; }
+    .hero-grid, .about-grid, .contact-grid{ grid-template-columns:1fr; }
+    .hero-grid{ gap:44px; }
+    .code-card{ max-width:460px; margin:0 auto; }
+    section{ padding:70px 0; }
+    .hero{ padding:120px 0 70px; }
+  }
+
+  @media (max-width:767px){
+    .project-grid{ grid-template-columns:1fr; }
+    .footer-top{ flex-direction:column; }
+  }
 </style>
+</head>
+<body data-theme="dark">
 
-<body>
+<div class="bg-decor" aria-hidden="true"></div>
 
-    <header>
+<!-- ============================= NAVBAR ============================= -->
+<header class="navbar">
+  <div class="navbar-inner">
+    <a href="#top" class="logo">&lt; VJ /&gt;</a>
 
-        <h1>My portfolio</h1>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#top" class="active">Home</a>
+      <a href="#about">About</a>
+      <a href="#projects">Projects</a>
+      <a href="#contact">Contact</a>
+    </nav>
 
-       <h5>  MADE BY VISHESH JAISWAL</h5>
-        <nav>
+    <div class="nav-right">
+      <button class="theme-toggle theme-toggle-desktop" id="themeToggle" type="button" aria-label="Switch to light mode" aria-pressed="false">
+        <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+        <svg id="iconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      </button>
+      <button class="menu-btn" id="menuBtn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobilePanel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+  </div>
 
-            
+  <div class="mobile-panel" id="mobilePanel">
+    <a href="#top">Home</a>
+    <a href="#about">About</a>
+    <a href="#projects">Projects</a>
+    <a href="#contact">Contact</a>
+    <button class="theme-toggle" id="themeToggleMobile" type="button" aria-label="Toggle theme" style="margin-top:6px; align-self:flex-start;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+    </button>
+  </div>
+</header>
 
-            
+<main id="top">
 
-            <ul>
+  <!-- ============================= HERO ============================= -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <span class="badge">Web developer</span>
+        <h1>Hi, I'm Vishesh Jaiswal.<br>Building clean and modern <em>web experiences.</em></h1>
+        <p class="lead">Passionate about creating responsive, user-friendly websites using modern web technologies — this portfolio is where I share what I'm learning and building.</p>
+        <div class="hero-actions">
+          <a href="#projects" class="btn btn-primary">
+            View projects
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </a>
+          <a href="#contact" class="btn btn-secondary">Contact me</a>
+        </div>
+      </div>
 
-                <li><a href=”#about”>About</a></li>
+      <div class="hero-visual">
+        <div class="code-card">
+          <div class="code-card-bar"><span></span><span></span><span></span></div>
+          <pre><span class="cmt">// hello.js</span>
+<span class="tag">function</span> <span class="txt">greet</span>() {
+  <span class="tag">return</span> <span class="txt">"Hello World"</span>;
+}
 
-                <li><a href=”#projects”>Projects</a></li>
+<span class="cmt">// building for the web...</span>
+<span class="tag">const</span> <span class="txt">status</span> = <span class="txt">"in progress"</span>;</pre>
+        </div>
+      </div>
+    </div>
+  </section>
 
-                <li><a href=”#contact”>Contact</a></li>
+  <!-- ============================= ABOUT ============================= -->
+  <section id="about">
+    <div class="wrap">
+      <span class="eyebrow reveal">About</span>
+      <h2 class="section-title reveal">About me</h2>
 
-            </ul>
+      <div class="about-grid">
+        <p class="reveal">Hi, I'm a web developer specializing in HTML and CSS, currently learning JavaScript and React. I enjoy turning simple ideas into working pages, and this site is a running record of that process — from my first project onward.</p>
 
-        </nav>
+        <div class="info-card reveal">
+          <div class="info-row">
+            <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+            <div><div class="label">Name</div><div class="value">Vishesh Jaiswal</div></div>
+          </div>
+          <div class="info-row">
+            <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg></span>
+            <div><div class="label">Role</div><div class="value">Web Developer</div></div>
+          </div>
+          <div class="info-row">
+            <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>
+            <div><div class="label">Focus</div><div class="value">Frontend Development</div></div>
+          </div>
+          <div class="info-row">
+            <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+            <div><div class="label">Currently learning</div><div class="value">React.js</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    </header>
+  <!-- ============================= SKILLS ============================= -->
+  <section id="skills">
+    <div class="wrap">
+      <span class="eyebrow reveal">Skills</span>
+      <h2 class="section-title reveal">Technologies I work with</h2>
+      <p class="section-lead reveal">The core tools I use to build and learn.</p>
 
-    
+      <div class="skills-grid">
+        <div class="skill-card reveal">
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 3l1.5 17L12 22l6.5-2L20 3H4z"/><path d="M7.5 7h9l-.4 4.5H9.3l.2 2.3 2.5.7 2.5-.7.2-2"/></svg></span>
+          <h3>HTML</h3>
+          <p>Semantic structure & accessible markup</p>
+        </div>
+        <div class="skill-card reveal">
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 3l1.5 17L12 22l6.5-2L20 3H4z"/><path d="M15 8H8.5l.3 3.5h6l-.3 3.7-2.5.8-2.5-.8-.15-1.7"/></svg></span>
+          <h3>CSS</h3>
+          <p>Layout, responsive design & theming</p>
+        </div>
+        <div class="skill-card reveal">
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 15.5c0 1 .7 1.5 1.6 1.5S11 16.3 11 15.3V9"/><path d="M14.5 13c0 .8.6 1.4 1.6 1.4.9 0 1.6-.5 1.6-1.2 0-2-3.2-1.1-3.2-3 0-.8.7-1.3 1.6-1.3.8 0 1.4.4 1.6 1"/></svg></span>
+          <h3>JavaScript</h3>
+          <p>Interactivity & DOM behaviour</p>
+        </div>
+        <div class="skill-card reveal">
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="2.2"/><circle cx="5" cy="5" r="1.6"/><circle cx="19" cy="5" r="1.6"/><circle cx="5" cy="19" r="1.6"/><circle cx="19" cy="19" r="1.6"/><path d="M6.2 6.2l4.2 4.2M17.8 6.2l-4.2 4.2M6.2 17.8l4.2-4.2M17.8 17.8l-4.2-4.2"/></svg></span>
+          <h3>React</h3>
+          <p>Learning component-based UIs</p>
+        </div>
+        <div class="skill-card reveal">
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="6" cy="6" r="2.2"/><circle cx="6" cy="18" r="2.2"/><circle cx="18" cy="12" r="2.2"/><path d="M6 8.2V15.8M8 6.6h6a4 4 0 0 1 4 4v0"/></svg></span>
+          <h3>Git</h3>
+          <p>Version control basics</p>
+        </div>
+        <div class="skill-card reveal">
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.4-1.2-1.1-1.5-1.1-1.5-1-.6.1-.6.1-.6 1 .1 1.6 1.1 1.6 1.1.9 1.6 2.4 1.1 3 .9.1-.7.4-1.1.6-1.4-2.2-.3-4.6-1.1-4.6-5a4 4 0 0 1 1.1-2.8 3.7 3.7 0 0 1 .1-2.7s.9-.3 3 1.1a10 10 0 0 1 5.4 0c2.1-1.4 3-1.1 3-1.1a3.7 3.7 0 0 1 .1 2.7 4 4 0 0 1 1.1 2.8c0 3.9-2.4 4.7-4.7 5 .4.4.7 1.1.7 2.2v3.2c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg></span>
+          <h3>GitHub</h3>
+          <p>Hosting & sharing my projects</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    
+  <!-- ============================= PROJECTS ============================= -->
+  <section id="projects">
+    <div class="wrap">
+      <span class="eyebrow reveal">My work</span>
+      <h2 class="section-title reveal">Featured projects</h2>
+      <p class="section-lead reveal">A look at what I've built so far, starting with where it all began.</p>
 
+      <div class="project-grid">
+        <article class="project-card reveal">
+          <div class="project-visual">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 9h18"/><path d="M7 14h4"/></svg>
+          </div>
+          <div class="project-body">
+            <h3>My First Website</h3>
+            <p>A simple website created while learning HTML and CSS — the very first version of this portfolio.</p>
+            <div class="tags">
+              <span class="tag">HTML</span>
+              <span class="tag">CSS</span>
+            </div>
+            <a class="project-link" href="https://drive.google.com/file/d/1eg2sAqu6EPeZ2n0AFZWUAq-eQgqVn5Nm/view?usp=drivesdk" target="_blank" rel="noopener noreferrer">
+              View project
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+        </article>
 
+        <article class="project-card placeholder-card reveal">
+          <p>Next project coming soon — this space is reserved for what I build next.</p>
+        </article>
 
-    <section id=”about”>
+        <article class="project-card placeholder-card reveal">
+          <p>Another slot for a future project. Editable placeholder.</p>
+        </article>
+      </div>
+    </div>
+  </section>
 
-        <h2>About</h2>
+  <!-- ============================= CONTACT ============================= -->
+  <section id="contact">
+    <div class="wrap">
+      <span class="eyebrow reveal">Get in touch</span>
+      <h2 class="section-title reveal">Let's work together</h2>
+      <p class="section-lead reveal">Have a project or idea? Feel free to get in touch.</p>
 
-        <p>Hi! I’m a web developer specializing in HTML, CSS, 
+      <div class="contact-grid">
+        <div class="reveal">
+          <div class="contact-list">
+            <div class="row">
+              <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><path d="M22 6l-10 7L2 6"/></svg></span>
+              <span>Available for freelance & learning collaborations</span>
+            </div>
+            <div class="row">
+              <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12S3 16 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+              <span>Rajapark, Jaipur (Raj.)</span>
+            </div>
+          </div>
 
-
-
-
-
- </p>
-
-    </section>
-
-
-
-    <section id=”projects”>
-
-        <h2>Project</h2>
-
-        <div class=”project”>
-
-
-
-            
-
-            
-
-            
-
-            
-
-            <h3>Project 1</h3>
-
-            <p>This is a simple website I made with HTML and CSS.
-
-  
-
-  
-
-  
-
-            
-
-<pre>
-
-    <a href=https://drive.google.com/file/d/1eg2sAqu6EPeZ2n0AFZWUAq-eQgqVn5Nm/view?usp=drivesdk>My file</a> </p>
-
+          <div class="social-row">
+            <a class="social-btn" href="#" aria-label="Instagram">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>
+            </a>
+            <a class="social-btn" href="#" aria-label="YouTube">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="6" width="19" height="12" rx="3"/><path d="M10 9.5l5 2.5-5 2.5v-5z" fill="currentColor" stroke="none"/></svg>
+            </a>
+            <a class="social-btn" href="#" aria-label="Facebook">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 9h2V6h-2c-1.7 0-3 1.3-3 3v2H9v3h2v6h3v-6h2l1-3h-3V9c0-.6.4-1 1-1z"/></svg>
+            </a>
+          </div>
         </div>
 
-        </pre>
-
-  
-
-  
-
-  
-
-        
-
-    </section>
-
-    <section id=”contact”>
-
-        <h2>Contact us</h2>
-
-        <form>
-
-            <input type=”text” placeholder=”Your-name” required>
-
-            <input type=”email” placeholder=”Your-email” required>
-
-        
-
-            
-
-            <button type=”submit”>submit</button>
-
+        <form class="contact-form reveal" id="contactForm" novalidate>
+          <div class="field" id="fieldName">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" autocomplete="name" required>
+            <span class="error">Please enter your name.</span>
+          </div>
+          <div class="field" id="fieldEmail">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" autocomplete="email" required>
+            <span class="error">Please enter a valid email address.</span>
+          </div>
+          <div class="field" id="fieldMessage">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" required></textarea>
+            <span class="error">Please write a short message.</span>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
+            Send message
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </button>
+          <p class="form-msg" id="formMsg" role="status">Thanks! Your message has been received in this demo.</p>
         </form>
+      </div>
+    </div>
+  </section>
 
-    </section>
+</main>
 
+<!-- ============================= FOOTER ============================= -->
+<footer>
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="#top" class="logo">&lt; VJ /&gt;</a>
+        <p>Building modern web experiences.</p>
+      </div>
+      <nav class="footer-links" aria-label="Footer">
+        <a href="#top">Home</a>
+        <a href="#about">About</a>
+        <a href="#projects">Projects</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <div class="social-row" style="margin-top:0;">
+        <a class="social-btn" href="#" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>
+        </a>
+        <a class="social-btn" href="#" aria-label="YouTube">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="6" width="19" height="12" rx="3"/><path d="M10 9.5l5 2.5-5 2.5v-5z" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a class="social-btn" href="#" aria-label="Facebook">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 9h2V6h-2c-1.7 0-3 1.3-3 3v2H9v3h2v6h3v-6h2l1-3h-3V9c0-.6.4-1 1-1z"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Vishesh Jaiswal. All rights reserved.</span>
+      <span>Rajapark, Jaipur (Raj.)</span>
+    </div>
+  </div>
+</footer>
 
+<!-- back to top -->
+<button class="to-top" id="toTop" type="button" aria-label="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
 
-    <footer>
+<!-- ============================= JAVASCRIPT ============================= -->
+<script>
+(function(){
+  "use strict";
 
-        
+  /* ---------- THEME ---------- */
+  var root = document.body;
+  var iconMoon = document.getElementById('iconMoon');
+  var iconSun = document.getElementById('iconSun');
+  var toggleBtn = document.getElementById('themeToggle');
+  var toggleBtnMobile = document.getElementById('themeToggleMobile');
 
-        <pre>
+  function applyTheme(theme){
+    root.setAttribute('data-theme', theme);
+    var isLight = theme === 'light';
+    if (iconMoon && iconSun){
+      iconMoon.style.display = isLight ? 'none' : 'block';
+      iconSun.style.display = isLight ? 'block' : 'none';
+    }
+    if (toggleBtn){
+      toggleBtn.setAttribute('aria-label', isLight ? 'Switch to dark mode' : 'Switch to light mode');
+      toggleBtn.setAttribute('aria-pressed', String(isLight));
+    }
+  }
 
-            <p>© 2025 My portfolio 
+  function getSavedTheme(){
+    try { return localStorage.getItem('portfolio-theme'); }
+    catch (e) { return null; }
+  }
+  function saveTheme(theme){
+    try { localStorage.setItem('portfolio-theme', theme); }
+    catch (e) { /* ignore */ }
+  }
 
-  <hr>                
+  var savedTheme = getSavedTheme() || 'dark';
+  applyTheme(savedTheme);
 
-     Location
+  function toggleTheme(){
+    var current = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    applyTheme(current);
+    saveTheme(current);
+  }
+  if (toggleBtn) toggleBtn.addEventListener('click', toggleTheme);
+  if (toggleBtnMobile) toggleBtnMobile.addEventListener('click', toggleTheme);
 
-     
+  /* ---------- MOBILE MENU ---------- */
+  var menuBtn = document.getElementById('menuBtn');
+  var mobilePanel = document.getElementById('mobilePanel');
+  if (menuBtn && mobilePanel){
+    menuBtn.addEventListener('click', function(){
+      var isOpen = mobilePanel.classList.toggle('open');
+      menuBtn.setAttribute('aria-expanded', String(isOpen));
+    });
+    mobilePanel.querySelectorAll('a').forEach(function(link){
+      link.addEventListener('click', function(){
+        mobilePanel.classList.remove('open');
+        menuBtn.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
 
-    Rajapark,jaipur (Raj.)
+  /* ---------- ACTIVE NAV LINK ON SCROLL ---------- */
+  var navLinks = document.querySelectorAll('.nav-links a');
+  var sections = ['top','about','projects','contact']
+    .map(function(id){ return document.getElementById(id); })
+    .filter(Boolean);
 
-    
+  function setActiveLink(){
+    var scrollPos = window.scrollY + 140;
+    var current = sections[0];
+    sections.forEach(function(sec){
+      if (sec.offsetTop <= scrollPos) current = sec;
+    });
+    navLinks.forEach(function(link){
+      var href = link.getAttribute('href').replace('#','');
+      link.classList.toggle('active', href === current.id);
+    });
+  }
+  window.addEventListener('scroll', setActiveLink, { passive:true });
+  setActiveLink();
 
-     <hr> 
+  /* ---------- SCROLL REVEAL ---------- */
+  var reveals = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry, i){
+        if (entry.isIntersecting){
+          setTimeout(function(){ entry.target.classList.add('in-view'); }, (i % 4) * 60);
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold:0.15 });
+    reveals.forEach(function(el){ io.observe(el); });
+  } else {
+    reveals.forEach(function(el){ el.classList.add('in-view'); });
+  }
 
-          Instagram  =>Portifolio
+  /* ---------- BACK TO TOP ---------- */
+  var toTop = document.getElementById('toTop');
+  window.addEventListener('scroll', function(){
+    if (window.scrollY > 450) toTop.classList.add('visible');
+    else toTop.classList.remove('visible');
+  }, { passive:true });
+  toTop.addEventListener('click', function(){
+    window.scrollTo({ top:0, behavior:'smooth' });
+  });
 
-Subscribe to:   Youtube => My portfolio
+  /* ---------- CONTACT FORM VALIDATION ---------- */
+  var form = document.getElementById('contactForm');
+  var formMsg = document.getElementById('formMsg');
 
-                Facebook => portifolio
+  function setError(fieldId, hasError){
+    var field = document.getElementById(fieldId);
+    if (field) field.classList.toggle('has-error', hasError);
+  }
 
-            </p>
+  function isValidEmail(value){
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+  }
 
-            </pre>
+  if (form){
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      var name = document.getElementById('name');
+      var email = document.getElementById('email');
+      var message = document.getElementById('message');
+      var valid = true;
 
-              <hr>
+      if (!name.value.trim()){ setError('fieldName', true); valid = false; }
+      else setError('fieldName', false);
 
-    </footer>
+      if (!isValidEmail(email.value.trim())){ setError('fieldEmail', true); valid = false; }
+      else setError('fieldEmail', false);
 
+      if (!message.value.trim()){ setError('fieldMessage', true); valid = false; }
+      else setError('fieldMessage', false);
 
+      if (!valid){
+        formMsg.classList.remove('show');
+        return;
+      }
 
-    <script src=”script.js”></script>
-
+      formMsg.classList.add('show');
+      form.reset();
+      setTimeout(function(){ formMsg.classList.remove('show'); }, 5000);
+    });
+  }
+})();
+</script>
 </body>
-
-  </html>
+</html>
